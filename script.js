@@ -19,7 +19,7 @@ function utcToJSTime(utcTime){
 // データ取得
 function ajaxRequest(lat, long){
   const url = 'https:api.openweathermap.org/data/2.5/forecast';
-  const appId = '**'
+  const appId = ''
 
   $.ajax({
     url: url,
@@ -32,11 +32,8 @@ function ajaxRequest(lat, long){
     }
   })
   .done(function(data){
-    console.log(data);
-
     // 都市名、国名国名
-    console.log('都市名:' + data.city.name);
-    console.log('国名:' + data.city.country);
+    $('#place').text(data.city.name + ',' + data.city.country);
 
     // 天気予報データ
     data.list.forEach(function(forecast, index){
@@ -49,10 +46,30 @@ function ajaxRequest(lat, long){
       const description = forecast.weather[0].description;
       const iconPath = `image/${forecast.weather[0].icon}.svg`;
 
-      console.log('日時:' + `${month}/${date} ${hours}:${min}`);
-      console.log('気温:' + temperature);
-      console.log('天気:' + description);
-      console.log('画像パス:' + iconPath);
+      // 現在の天気とそれ以外で出力を変える
+
+      if(index === 0){
+        const currentWeather = `
+        <div class="icon"><img src="${iconPath}"></div>
+        <div class="info">
+          <p>
+            <span class="description">現在の天気:${description}</span>
+            <span class="temp">${temperature}</span>℃
+          </p>
+        </div>`;
+        $('#weather').html(currentWeather);
+      } else {
+        const tableRow = `
+        <tr>
+          <td class="info">
+            ${month}/${date} ${hours}:${min}
+          </td>
+          <td class="icon"><img src="${iconPath}"</td>
+          <td><span class="description">${description}</span></td>
+          <td><span class="temp">${temperature}℃</span></td>
+        </tr>`;
+        $('#forecast').append(tableRow);
+      }
     });
   })
   .fail(function(){
